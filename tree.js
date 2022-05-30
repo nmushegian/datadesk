@@ -6,11 +6,11 @@ class DataDesk {
         this.map = map
     }
     get(key) {
-        return [true, this.map[key]]
+        return [true, this.map.get(key)]
     }
     set(key, val) {
-        let prev = this.map[key]
-        this.map[key] = val
+        let prev = this.map.get(key)
+        this.map = this.map.set(key, val)
         return [true, prev]
     }
 }
@@ -30,7 +30,8 @@ class DataTree {
     save(desk) {
         let snap = hash(salt, nonce)
         snaps[snap] = desk
-        return [true]
+        nonce++
+        return [true, snap]
     }
 
     snip(snap) {
