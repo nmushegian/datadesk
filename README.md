@@ -1,6 +1,6 @@
 # pure functional database abstraction
 
-`datatree` is a simple purely functional set abstraction with the goal
+`datadesk` is a simple purely functional set abstraction with the goal
 of eventually making very big and fast purely functional databases.
 
 Right now we are defining an interface and creating a reference
@@ -11,9 +11,14 @@ desk = tree.load(snap)    // get a desk from a snap ("" is init desk)
 snap = tree.save(desk)    // save a desk to get a snap
 desk.get(key)             // virtually emptyblob-initialized
 desk.set(key,val)         // set, also return the last value
+
+tree.snip(snap)  // remove this snapshot, coalescing internal representation
+                 // of dependent desks
+
+
 ```
 
-Two important properties we must have:
+Some requirements:
 - `save` returns identifiers that are also valid keys/values
 - `save` returns identifiers that have negligible chance of collision
   with values, ie, they are hashes, but also,
