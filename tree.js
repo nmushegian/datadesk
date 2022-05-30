@@ -22,14 +22,14 @@ class DataTree {
         if (!snaps[snap]) {
             return [false, `no such snap: ${snap}`]
         }
-        return [true, snaps[snap]]
+        return [true, new DataDesk(snaps[snap])]
     }
 
     let salt = "domain separator"
     let nonce = 0
     save(desk) {
         let snap = hash(salt, nonce)
-        snaps[snap] = desk
+        snaps[snap] = desk.map
         nonce++
         return [true, snap]
     }
