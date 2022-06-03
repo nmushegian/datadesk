@@ -1,37 +1,70 @@
+import { Map } from 'immutable'
+export { DataDesk }
 
-
-class DataDesk {
-    let map
+// thin wrapper around mutable handle with emptyblob-initialize
+class Desk {
     constructor(map) {
         this.map = map
+        this.done = false
     }
-    get(key) {
-        return [true, this.map.get(key)]
+    get(k) {
+        if (this.map.has(k)) {
+            let val = this.map.get(k)
+            if (!val) {
+                return ""
+            } else {
+                return this.map.get(k)
+            }
+        } else {
+            return ""
+        }
     }
-    set(key, val) {
-        let prev = this.map.get(key)
-        this.map = this.map.set(key, val)
-        return [true, prev]
+    set(k, v) {
+        if (this.done) { throw new Error(`panic: set on sealed desk`) }
+        if (v == '') {
+            this.map.delete(k)
+        } else {
+            this.map.set(k, v)
+        }
+    }
+    _seal() {
+        this.done = true;
+        this.map = this.map.asImmutable()
+        return this.map
     }
 }
 
-class DataTree {
-
-    let snaps = {"": new ImmutableMap()}
-    load(snap) {
-        if (!snaps[snap]) {
-            return [false, `no such snap: ${snap}`]
+class DataDesk {
+    constructor(salt="test salt", nonce=0) {
+        this.salt = salt
+        this.nonce = nonce
+        this.snaps = {
+            "": new Map()
         }
-        return [true, new DataDesk(snaps[snap])]
     }
 
-    let salt = "domain separator"
-    let nonce = 0
-    save(desk) {
-        let snap = hash(salt, nonce)
-        snaps[snap] = desk.map
-        nonce++
-        return [true, snap]
+    edit(snap, save, func) {
+        if (!this.snaps[snap]) {
+            throw new Error(`no such snap: ${snap}`)
+        }
+        if (this.snaps[save]) {
+            throw new Error(`snap already exists: ${save}`)
+        }
+        let prev = this.snaps[snap]
+        let desk = new Desk(prev.asMutable())
+        func(desk)
+        let next = desk._seal().asImmutable()
+        this.snaps[save] = next
+        return desk
+    }
+
+    view(snap) {
+        if (!this.snaps[snap]) {
+            throw new Error(`no such snap: ${snap}`)
+        }
+        let desk = new Desk(this.snaps[snap])
+        desk._seal()
+        return desk
     }
 
     snip(snap) {

@@ -1,0 +1,11 @@
+{
+    "name": "datadesk",
+    "version": "0.0.1",
+    "type": "module",
+    "dependencies": {
+        "immutable": "^4.1.0"
+    },
+    "devDependencies": {
+        "tapzero": "^0.6.1"
+    }
+}
