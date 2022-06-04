@@ -35,25 +35,23 @@ class Desk {
 }
 
 class DataDesk {
-    constructor(salt="test salt", nonce=0) {
-        this.salt = salt
-        this.nonce = nonce
+    constructor() {
         this.snaps = {
             "": new Map()
         }
     }
 
-    edit(snap, save, func) {
-        if (!this.snaps[snap]) {
-            throw new Error(`no such snap: ${snap}`)
+    edit(load, save, func) {
+        if (!this.snaps[load]) {
+            throw new Error(`no such snap: ${load}`)
         }
         if (this.snaps[save]) {
             throw new Error(`snap already exists: ${save}`)
         }
-        let prev = this.snaps[snap]
+        let prev = this.snaps[load]
         let desk = new Desk(prev.asMutable())
         func(desk)
-        let next = desk._seal().asImmutable()
+        let next = desk._seal()
         this.snaps[save] = next
         return desk
     }
